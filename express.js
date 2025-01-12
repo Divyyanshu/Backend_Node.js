@@ -8,7 +8,10 @@ app.use(express.json())
 
 
 app.use((req, res ,next)=>{
-console.log(`${req.method} hit on the ${req.url} at ${Date.now()}`)
+    const date = new Date()
+    const time = date.toLocaleTimeString()
+    // create logger 
+console.log(`${req.method} hit on the ${req.url} route at ${time}`)
 next()
 })
 
