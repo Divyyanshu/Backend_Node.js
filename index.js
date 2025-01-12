@@ -1,35 +1,55 @@
-const http = require('http');
-const fs = require("fs")
+const express = require("express");
+const app = express();
+const mongoose = require("mongoose");
+const fs =  require("fs")
 
 
-let fruits = ["apple" ,"mango" , "graphes"]
-
-const server = http.createServer((req,res)=>{
-    const home = fs.readFileSync("./home.text" , "utf-8")
-    const homeData = fs.readFileSync("./home.html" , "utf-8")
-    const about = fs.readFileSync("./about.text" , "utf-8")
-    const nav = fs.readFileSync("./nav.text" , "utf-8")
-
-    console.log(req.url)
-
-    if(req.url === '/home'){
-        res.writeHead(200,{
-            'Content-Type' : "text/html"
-        })
-        res.end(homeData)
-    }else if(req.url === '/about'){
-        res.end(about)
-    }else if(req.url === '/nav'){
-        res.end(nav)
-    }else if(req.url === '/homed'){
-        res.end(home)
-    }else{
-        res.end("my website")
-    }
-    // res.end(country)
+mongoose.connect('mongodb://localhost:27017/').then(() => {
+    console.log("success run mongoose")
+}).catch((err) => {
+    console.log(err)
 })
+// user schema
+const UserSchema = new mongoose.Schema({
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      unique: true,
+    },
+    age: {
+      type: Number,
+    },
+  });
+//NOTE model === collection
+
+const User = mongoose.model('user', UserSchema);
 
 
-server.listen(3000,()=>{
-    console.log("server is ruinng")
+const body = {
+  name: 'riteshpatidar@gmail.com',
+  email: 'lakshit@gmail.com',
+  age: 20,
+};
+
+
+//NOTE Create Method
+User.create(body)
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+//NOTE READ FIND() METHOD
+//operator $gt , $lt , $gte , $lte
+User.find({ age: { $gt: 20 } }).then((data) =>
+  fs.writeFileSync('./age.json', JSON.stringify(data))
+);
+
+app.listen(3000, () => {
+    console.log("run server succeessfully")
 })
